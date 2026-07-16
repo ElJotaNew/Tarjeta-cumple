@@ -1,8 +1,0 @@
-{
-  "name": "Invitación Mis 18 - Jhonatan",
-  "description": "Elegante invitación interactiva para la celebración de los 18 años de Jhonatan con brújula inteligente y ruteo.",
-  "requestFramePermissions": [
-    "geolocation"
-  ],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
