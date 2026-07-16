@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis 18 · Jhonatan</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configure Tailwind theme to match our exact variables -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              void: '#05080f',
+              depth: '#0c1930',
+              steel: '#4d6786',
+              silver: '#dbe3ea',
+              mist: '#93a7bb',
+            },
+            fontFamily: {
+              sans: ['Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+              serif: ['Fraunces', 'Georgia', 'serif'],
+              mono: ['IBM Plex Mono', 'ui-monospace', 'monospace'],
+            },
+            screens: {
+              'xs': '375px',
+            },
+            animation: {
+              'twinkle': 'twinkle 3s ease-in-out infinite',
+            }
+          }
+        }
+      }
+    </script>
+    
+    <style type="text/css">
+      /* Twinkle animation */
+      @keyframes twinkle {
+        0%, 100% { opacity: 0.2; transform: scale(0.8); }
+        50% { opacity: 1; transform: scale(1.2); }
+      }
+      .animate-twinkle {
+        animation: twinkle 3s ease-in-out infinite;
+      }
+      
+      body {
+        background-color: #05080f;
+        color: #dbe3ea;
+        font-family: 'Space Grotesk', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      
+      /* Subtle page transition styling */
+      .fade-in-section {
+        opacity: 0;
+        transform: translateY(15px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+      .fade-in-section.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body class="relative min-h-screen w-full flex flex-col items-center select-none overflow-x-hidden pb-24">
+    
+    <!-- 1. Starfield Background (Parallax + Twinkling Grid Canvas) -->
+    <div id="starfield-container" class="fixed inset-0 z-0 overflow-hidden pointer-events-none transition-transform duration-300 ease-out">
+      <!-- Soft Nebula Gradients -->
+      <div class="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] opacity-40 bg-[radial-gradient(circle_at_center,rgba(12,25,48,0.5)_0%,rgba(5,8,15,1)_100%)]"></div>
+      <div class="absolute top-[10%] right-[5%] w-[400px] h-[400px] rounded-full bg-steel/10 blur-[120px] pointer-events-none"></div>
+      <div class="absolute bottom-[15%] left-[5%] w-[350px] h-[350px] rounded-full bg-depth/40 blur-[100px] pointer-events-none"></div>
+      
+      <!-- Stars Canvas -->
+      <canvas id="stars-canvas" class="absolute inset-0 w-full h-full"></canvas>
+      
+      <!-- Grid Overlay -->
+      <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(77,103,134,1) 1px, transparent 1px), linear-gradient(90deg, rgba(77,103,134,1) 1px, transparent 1px); background-size: 46px 46px;"></div>
+    </div>
+
+    <!-- 2. Atmospheric Ambient Audio Player -->
+    <div id="ambient-audio-player" class="fixed top-4 right-4 z-50 flex items-center gap-3 rounded-full bg-depth/80 border border-steel/30 px-3 py-1.5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-steel/60">
+      <div class="flex flex-col items-end">
+        <span class="text-[9px] uppercase tracking-[2px] text-mist font-medium leading-none mb-0.5">Música</span>
+        <span class="text-[8px] uppercase tracking-[1px] text-silver/60 font-mono leading-none">Ambiental</span>
+      </div>
+      <div class="w-14 h-6 overflow-hidden">
+        <canvas id="audio-visualizer" width="56" height="24" class="w-full h-full"></canvas>
+      </div>
+      <button id="audio-toggle-btn" class="flex h-8 w-8 items-center justify-center rounded-full bg-depth text-mist hover:text-silver hover:bg-steel/10 transition-all duration-300 focus:outline-none" title="Activar música celestial" aria-label="Activar música celestial">
+        <i data-lucide="volume-x" class="h-4.5 w-4.5"></i>
+      </button>
+    </div>
+
+    <!-- 3. Main Container -->
+    <main class="relative z-10 w-full max-w-md flex flex-col items-center">
+      
+      <!-- Nameplate Header -->
+      <header id="app-header" class="w-full flex justify-between items-center px-6 pt-16 xs:pt-14 sm:pt-8 font-mono text-[10px] tracking-[2.5px] uppercase text-mist transition-opacity duration-700">
+        <span>Cali, Colombia</span>
+        <span class="flex items-center gap-1">
+          <i data-lucide="sparkles" class="w-3 h-3 text-steel animate-pulse"></i>
+          <span>N.º 018</span>
+        </span>
+      </header>
+
+      <!-- Compass Section -->
+      <section id="compass-section" class="mt-4 sm:mt-6 flex flex-col items-center w-full fade-in-section visible">
+        <div class="flex flex-col items-center">
+          <div class="relative flex flex-col items-center p-6 w-full max-w-sm rounded-3xl bg-depth/40 border border-steel/20 backdrop-blur-md shadow-2xl">
+            <!-- Mode indicators -->
+            <div class="absolute top-4 left-4 right-4 flex justify-between items-center text-[9px] uppercase tracking-[2px] text-mist/80 font-mono">
+              <div class="flex items-center gap-1.5">
+                <span id="dot-north" class="inline-block w-1.5 h-1.5 rounded-full bg-mist animate-pulse"></span>
+                <span>N-Modo</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="dot-party" class="inline-block w-1.5 h-1.5 rounded-full bg-steel/30"></span>
+                <span>Party-Modo</span>
+              </div>
+            </div>
+
+            <!-- Compass Ring Container -->
+            <div id="compass-ring-container" class="relative w-64 h-64 mt-4 drop-shadow-[0_0_35px_rgba(77,103,134,0.25)] select-none" style="transition: transform 4s ease-in-out;">
+              <svg id="compass-ring" viewBox="0 0 240 240" class="w-full h-full overflow-visible" aria-label="Brújula astronómica interactiva">
+                <defs>
+                  <linearGradient id="needleGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ffffff" />
+                    <stop offset="100%" stop-color="#93a7bb" />
+                  </linearGradient>
+                  <radialGradient id="ringGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#0c1930" stop-opacity="1" />
+                    <stop offset="100%" stop-color="#05080f" stop-opacity="0.8" />
+                  </radialGradient>
+                </defs>
+
+                <!-- Outer Compass border -->
+                <circle cx="120" cy="120" r="102" fill="url(#ringGlow)" stroke="#4d6786" stroke-width="1" opacity="0.3" />
+                <circle cx="120" cy="120" r="100" fill="none" stroke="#4d6786" stroke-width="1" opacity="0.6" />
+
+                <!-- Generated Ticks (Slow continuous cosmic spin) -->
+                <g id="ticks-group" style="transform-origin: 120px 120px; transition: transform 0.5s ease-out;"></g>
+
+                <!-- Cardinal Letters -->
+                <text x="120" y="22" text-anchor="middle" dominant-baseline="middle" class="fill-mist font-mono font-medium text-[11px] tracking-widest">N</text>
+                <text x="218" y="122" text-anchor="middle" dominant-baseline="middle" class="fill-mist font-mono font-medium text-[11px] tracking-widest">E</text>
+                <text x="120" y="220" text-anchor="middle" dominant-baseline="middle" class="fill-mist font-mono font-medium text-[11px] tracking-widest">S</text>
+                <text x="22" y="122" text-anchor="middle" dominant-baseline="middle" class="fill-mist font-mono font-medium text-[11px] tracking-widest">W</text>
+
+                <!-- Inner Ring Dial -->
+                <circle cx="120" cy="120" r="54" fill="#0c1930" stroke="#4d6786" stroke-width="1" opacity="0.9" />
+
+                <!-- Center Big 18 Graphic -->
+                <text id="center-18" x="120" y="125" text-anchor="middle" dominant-baseline="middle" class="fill-silver font-serif font-semibold text-[56px] select-none pointer-events-none" style="transform-origin: 120px 120px; transition: transform 0.3s ease-out;">18</text>
+
+                <!-- Interactive Animated Needle -->
+                <g id="needle-group" style="transform-origin: 120px 120px; transition: transform 1.2s cubic-bezier(0.25, 0.8, 0.25, 1.1);" class="pointer-events-none">
+                  <!-- Wobbling sub-group -->
+                  <g id="needle-wobble" style="transform-origin: 120px 120px;">
+                    <!-- Compass Needle Polygon -->
+                    <polygon points="120,24 127,120 120,148 113,120" fill="url(#needleGrad)" />
+                  </g>
+                  <!-- Golden/Brass accent pivot -->
+                  <circle cx="120" cy="120" r="4.5" fill="#dbe3ea" />
+                  <circle cx="120" cy="120" r="2" fill="#4d6786" />
+                </g>
+              </svg>
+            </div>
+
+            <!-- Current Coordinates/Angle Output -->
+            <div id="bearing-output" class="mt-5 font-mono text-[11px] text-mist tracking-[2.5px] uppercase">
+              N 0° 0' 00" · Calibrado
+            </div>
+
+            <!-- Controls Layout -->
+            <div class="mt-6 flex flex-col gap-3.5 w-full">
+              <div class="flex gap-2.5">
+                <!-- North Align Button -->
+                <button id="btn-align-north" class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-xs font-sans font-medium uppercase tracking-[1.5px] transition-all duration-300 bg-steel/30 text-silver border-steel/50">
+                  <i data-lucide="navigation" class="w-3.5 h-3.5 rotate-45"></i>
+                  <span>Alinear Norte</span>
+                </button>
+
+                <!-- Locate Party Button -->
+                <button id="btn-locate-party" class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-xs font-sans font-medium uppercase tracking-[1.5px] transition-all duration-300 bg-depth text-mist border-steel/10 hover:text-silver hover:bg-steel/15">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                  <span>Cómo llegar</span>
+                </button>
+              </div>
+
+              <!-- Inline geolocation description / distance result -->
+              <div id="geo-status" class="hidden text-center font-mono text-[11px] text-silver/70 animate-pulse py-1">
+                Obteniendo tu señal de satélite...
+              </div>
+
+              <div id="geo-error" class="hidden flex items-start gap-1.5 bg-red-950/20 border border-red-900/40 rounded-xl p-2.5 text-left text-[11px] text-red-200/90 leading-relaxed font-sans">
+                <i data-lucide="info" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i>
+                <span id="geo-error-text">No pudimos acceder a tu ubicación.</span>
+              </div>
+
+              <div id="geo-success" class="hidden bg-steel/10 border border-steel/20 rounded-xl p-3 text-center">
+                <div class="font-sans text-[10px] uppercase tracking-[2px] text-mist mb-1">Tu Distancia al Destino</div>
+                <div class="font-mono text-lg font-semibold text-silver">
+                  Estás a <span id="distance-value" class="text-white font-bold">-- km</span> del evento
+                </div>
+                <div class="font-sans text-[9px] text-mist/70 mt-1">
+                  La aguja se ha magnetizado para apuntar directo a Cali
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Guest of Honor Titles -->
+      <div class="mt-6 sm:mt-8 text-center px-6 fade-in-section">
+        <h1 class="font-serif font-light text-[28px] xs:text-[34px] sm:text-[40px] tracking-[6px] xs:tracking-[8px] uppercase text-white leading-tight">
+          Jhonatan
+        </h1>
+      </div>
+
+      <!-- Invitation Text Card -->
+      <div class="mt-4 sm:mt-6 text-center max-w-[280px] xs:max-w-[310px] px-2 xs:px-4 fade-in-section">
+        <p class="font-sans text-[11px] xs:text-xs leading-relaxed text-silver/90 font-medium">
+          Quiero invitarte a celebrar conmigo un día muy especial: mi cumpleaños de 18 años. 🥳🎂
+          <br /><br />
+          Me haría muy feliz que pudieras acompañarme y compartir un rato lleno de risas, buena compañía y excelentes recuerdos en este paso a la mayoría de edad. Para mí es muy especial contar contigo.
+          <br /><br />
+          <span class="text-white font-semibold tracking-[0.5px]">¡Nos vemos para pasar una noche inolvidable!</span>
+        </p>
+      </div>
+
+      <!-- Visual Rule (Ticks) -->
+      <div class="w-[140px] xs:w-[180px] h-[9px] mt-6 sm:mt-8 border-b border-steel/30 opacity-55" style="background-image: repeating-linear-gradient(90deg, #4d6786 0 1px, transparent 1px 13px); background-position: bottom; background-size: auto 9px;"></div>
+
+      <!-- Event Key Details -->
+      <section class="mt-6 sm:mt-8 flex justify-center items-center w-full max-w-[320px] px-4 fade-in-section">
+        <!-- Date Column -->
+        <div class="flex-1 flex flex-col items-center text-center">
+          <span class="text-[9px] font-mono tracking-widest uppercase text-mist mb-1">Fecha</span>
+          <span class="font-mono text-sm xs:text-base font-semibold text-silver tracking-[1px]">25.07.2026</span>
+          <span class="text-[8px] text-mist/60 uppercase tracking-[0.5px] mt-0.5">Sábado</span>
+        </div>
+
+        <!-- Elegant Divider -->
+        <div class="w-[1px] h-10 bg-steel/30 mx-4"></div>
+
+        <!-- Hour Column -->
+        <div class="flex-1 flex flex-col items-center text-center">
+          <span class="text-[9px] font-mono tracking-widest uppercase text-mist mb-1">Hora</span>
+          <span class="font-mono text-sm xs:text-base font-semibold text-silver tracking-[1px]">04:00 PM</span>
+          <span class="text-[8px] text-mist/60 uppercase tracking-[0.5px] mt-0.5">Atardecer</span>
+        </div>
+      </section>
+
+      <!-- Countdown Timer Block -->
+      <section id="countdown-block" class="mt-6 sm:mt-8 flex justify-center gap-1.5 xs:gap-2 px-2 fade-in-section" aria-label="Contador regresivo">
+        <div class="flex flex-col items-center">
+          <div class="relative w-[50px] h-[50px] xs:w-[58px] xs:h-[58px] rounded-xl border border-steel/20 bg-depth/40 backdrop-blur-md flex items-center justify-center font-mono text-[18px] xs:text-[22px] font-bold text-white shadow-lg shadow-void/40 overflow-hidden">
+            <span id="timer-days">00</span>
+          </div>
+          <span class="mt-1.5 font-mono text-[8px] xs:text-[9px] uppercase tracking-[1px] xs:tracking-[1.5px] text-mist">Días</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="relative w-[50px] h-[50px] xs:w-[58px] xs:h-[58px] rounded-xl border border-steel/20 bg-depth/40 backdrop-blur-md flex items-center justify-center font-mono text-[18px] xs:text-[22px] font-bold text-white shadow-lg shadow-void/40 overflow-hidden">
+            <span id="timer-hours">00</span>
+          </div>
+          <span class="mt-1.5 font-mono text-[8px] xs:text-[9px] uppercase tracking-[1px] xs:tracking-[1.5px] text-mist">Horas</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="relative w-[50px] h-[50px] xs:w-[58px] xs:h-[58px] rounded-xl border border-steel/20 bg-depth/40 backdrop-blur-md flex items-center justify-center font-mono text-[18px] xs:text-[22px] font-bold text-white shadow-lg shadow-void/40 overflow-hidden">
+            <span id="timer-minutes">00</span>
+          </div>
+          <span class="mt-1.5 font-mono text-[8px] xs:text-[9px] uppercase tracking-[1px] xs:tracking-[1.5px] text-mist">Min</span>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="relative w-[50px] h-[50px] xs:w-[58px] xs:h-[58px] rounded-xl border border-steel/20 bg-depth/40 backdrop-blur-md flex items-center justify-center font-mono text-[18px] xs:text-[22px] font-bold text-white shadow-lg shadow-void/40 overflow-hidden">
+            <span id="timer-seconds">00</span>
+          </div>
+          <span class="mt-1.5 font-mono text-[8px] xs:text-[9px] uppercase tracking-[1px] xs:tracking-[1.5px] text-mist">Seg</span>
+        </div>
+      </section>
+
+      <!-- Envelope Rain Tradition Module (Lluvia de Sobres) -->
+      <section class="w-full max-w-sm mt-8 px-4 fade-in-section">
+        <div class="relative rounded-3xl bg-depth/30 border border-steel/15 backdrop-blur-md p-6 shadow-xl overflow-hidden">
+          <!-- Ambient Glow -->
+          <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-steel/5 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div class="text-center">
+            <i data-lucide="mail" class="w-5 h-5 text-mist mx-auto mb-2"></i>
+            <h2 class="font-serif text-lg tracking-[3.5px] uppercase text-silver">Lluvia de Sobres</h2>
+            <p class="text-[9px] text-mist tracking-widest uppercase mt-0.5">Tradición y presentes</p>
+          </div>
+
+          <div class="flex flex-col gap-4 text-center mt-5">
+            <div class="flex justify-center items-center gap-1.5 font-sans text-[11px] text-mist/70 uppercase">
+              <i data-lucide="heart" class="w-3.5 h-3.5 text-red-400/60"></i>
+              <span>¡Tu presencia es mi mayor regalo!</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Location Map Frame -->
+      <section class="w-full max-w-sm mt-10 px-4 fade-in-section">
+        <div class="rounded-3xl overflow-hidden border border-steel/20 bg-depth/30 backdrop-blur-md p-5 shadow-xl">
+          <span class="block text-center text-[10px] font-mono tracking-widest uppercase text-mist mb-4 flex items-center justify-center gap-1.5">
+            <i data-lucide="map" class="w-3.5 h-3.5 text-steel"></i>
+            <span>Ubicación de la Recepción</span>
+          </span>
+
+          <!-- Inverted map frame -->
+          <div class="relative rounded-2xl overflow-hidden border border-steel/15 bg-void">
+            <iframe
+              class="w-full h-[180px] grayscale invert contrast-[0.95] brightness-[0.85] opacity-80"
+              src="https://maps.google.com/maps?q=3.395722,-76.508472&z=16&output=embed"
+              loading="lazy"
+              title="Google Maps con el lugar del evento"
+              referrerpolicy="no-referrer-when-downgrade"
+              id="map-iframe"
+            ></iframe>
+          </div>
+
+          <!-- Action Directions -->
+          <div class="mt-4 flex w-full">
+            <a 
+              href="https://www.google.com/maps/dir/?api=1&destination=3.395722,-76.508472"
+              target="_blank" 
+              rel="noopener noreferrer"
+              id="google-maps-btn"
+              class="w-full py-3 rounded-xl border border-white bg-white hover:bg-silver hover:scale-[1.01] text-void font-sans text-center text-xs font-semibold uppercase tracking-[2.5px] transition-all duration-300 select-none decoration-transparent shadow-lg shadow-white/5 flex items-center justify-center gap-2 text-black"
+            >
+              <i data-lucide="navigation" class="w-3.5 h-3.5 text-void shrink-0"></i>
+              <span>Abrir en Google Maps</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer closing mark -->
+      <footer class="mt-16 text-center select-none pb-8 fade-in-section">
+        <div class="text-[10px] font-mono tracking-[4px] uppercase text-mist/75 animate-pulse">
+          Te espero para celebrar
+        </div>
+        <div class="text-[8px] font-mono tracking-[1px] text-mist/30 mt-3 uppercase">
+          © 2026 · Cali, Colombia
+        </div>
+      </footer>
+
+    </main>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      // 1. Initialize Lucide Icons immediately
+      lucide.createIcons();
+    </script>
+
+    <!-- App Interactive Script -->
+    <script>
+      // --- CONSTANTS ---
+      const VENUE_COORDS = { lat: 3.395722, lng: -76.508472 };
+      const TARGET_DATE = new Date('2026-07-25T16:00:00').getTime();
+
+      // --- STARFIELD CANVAS ENGINE ---
+      const starsCanvas = document.getElementById('stars-canvas');
+      const starsCtx = starsCanvas.getContext('2d');
+      const starfieldContainer = document.getElementById('starfield-container');
+      
+      let stars = [];
+      const numStars = 120;
+      let mouseX = 0;
+      let mouseY = 0;
+      let targetX = 0;
+      let targetY = 0;
+
+      function resizeCanvas() {
+        starsCanvas.width = window.innerWidth;
+        starsCanvas.height = window.innerHeight;
+        initStars();
+      }
+
+      function initStars() {
+        stars = [];
+        for (let i = 0; i < numStars; i++) {
+          stars.push({
+            x: Math.random() * starsCanvas.width,
+            y: Math.random() * starsCanvas.height,
+            size: Math.random() * 2.2 + 0.5,
+            opacity: Math.random() * 0.7 + 0.3,
+            twinkleSpeed: 0.01 + Math.random() * 0.03,
+            twinkleDirection: Math.random() > 0.5 ? 1 : -1
+          });
+        }
+      }
+
+      function drawStars() {
+        starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+        starsCtx.fillStyle = '#ffffff';
+
+        stars.forEach(star => {
+          // Update twinkle
+          star.opacity += star.twinkleSpeed * star.twinkleDirection;
+          if (star.opacity >= 1) {
+            star.opacity = 1;
+            star.twinkleDirection = -1;
+          } else if (star.opacity <= 0.2) {
+            star.opacity = 0.2;
+            star.twinkleDirection = 1;
+          }
+
+          starsCtx.beginPath();
+          starsCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+          starsCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+          starsCtx.fill();
+        });
+      }
+
+      // Parallax effect with smoothing
+      window.addEventListener('mousemove', (e) => {
+        targetX = (e.clientX - window.innerWidth / 2) / window.innerWidth * 25;
+        targetY = (e.clientY - window.innerHeight / 2) / window.innerHeight * 25;
+      });
+
+      // Also support touch moves for mobile parallax!
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          targetX = (e.touches[0].clientX - window.innerWidth / 2) / window.innerWidth * 15;
+          targetY = (e.touches[0].clientY - window.innerHeight / 2) / window.innerHeight * 15;
+        }
+      });
+
+      function animateStarfield() {
+        // Smooth interpolation
+        mouseX += (targetX - mouseX) * 0.08;
+        mouseY += (targetY - mouseY) * 0.08;
+        
+        starfieldContainer.style.transform = `translate3d(${mouseX * -0.4}px, ${mouseY * -0.4}px, 0)`;
+        
+        drawStars();
+        requestAnimationFrame(animateStarfield);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      animateStarfield();
+
+
+      // --- AMBIENT BELL SYNTHESIZER ---
+      let audioCtx = null;
+      let analyser = null;
+      let isPlaying = false;
+      let synthInterval = null;
+      let activeOscillators = [];
+      const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00]; // Pentatonic C
+      const audioBtn = document.getElementById('audio-toggle-btn');
+      const visualizerCanvas = document.getElementById('audio-visualizer');
+      const visualizerCtx = visualizerCanvas.getContext('2d');
+      let visualizerFrameId = null;
+
+      function startAudioEngine() {
+        try {
+          if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass();
+          }
+
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 64;
+
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
+
+          const delay = audioCtx.createDelay(1.0);
+          delay.delayTime.setValueAtTime(0.4, audioCtx.currentTime);
+
+          const feedback = audioCtx.createGain();
+          feedback.gain.setValueAtTime(0.5, audioCtx.currentTime);
+
+          delay.connect(feedback);
+          feedback.connect(delay);
+
+          analyser.connect(audioCtx.destination);
+          filter.connect(analyser);
+          delay.connect(filter);
+
+          function playChime(freq, duration = 3.0, volume = 0.15) {
+            if (!audioCtx || audioCtx.state === 'suspended') return;
+            const now = audioCtx.currentTime;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gainNode.gain.setValueAtTime(0.001, now);
+            gainNode.gain.linearRampToValueAtTime(volume, now + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            osc.connect(gainNode);
+            gainNode.connect(filter);
+            gainNode.connect(delay);
+
+            osc.start(now);
+            osc.stop(now + duration + 0.5);
+
+            activeOscillators.push({ osc, gainNode });
+          }
+
+          // Ambient chord drone
+          function playDrone() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const droneFreqs = [130.81, 196.00, 246.94, 329.63]; // C3, G3, B3, E4
+            
+            droneFreqs.forEach(freq => {
+              const osc = audioCtx.createOscillator();
+              const gainNode = audioCtx.createGain();
+
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, now);
+
+              gainNode.gain.setValueAtTime(0.001, now);
+              gainNode.gain.linearRampToValueAtTime(0.02, now + 1.0);
+
+              osc.connect(gainNode);
+              gainNode.connect(filter);
+
+              osc.start(now);
+              activeOscillators.push({ osc, gainNode });
+            });
+          }
+
+          playDrone();
+          playChime(523.25, 4.0, 0.12); // C5 introductory note
+          setTimeout(() => playChime(659.25, 4.0, 0.08), 800); 
+          setTimeout(() => playChime(783.99, 4.0, 0.06), 1600);
+
+          synthInterval = setInterval(() => {
+            const randomNote = scale[Math.floor(Math.random() * scale.length)];
+            const duration = Math.random() * 3 + 3;
+            const vol = Math.random() * 0.08 + 0.05;
+            playChime(randomNote, duration, vol);
+          }, 2400);
+
+          isPlaying = true;
+          audioBtn.classList.add('bg-steel/30', 'text-silver', 'animate-pulse');
+          audioBtn.innerHTML = '<i data-lucide="volume-2" class="h-4.5 w-4.5 text-silver"></i>';
+          lucide.createIcons();
+          drawVisualizer();
+
+        } catch (e) {
+          console.error('Failed to start synth:', e);
+        }
+      }
+
+      function stopAudioEngine() {
+        if (synthInterval) {
+          clearInterval(synthInterval);
+          synthInterval = null;
+        }
+
+        activeOscillators.forEach(item => {
+          try {
+            item.osc.stop();
+          } catch(err) {}
+        });
+        activeOscillators = [];
+
+        if (audioCtx) {
+          audioCtx.suspend();
+        }
+
+        if (visualizerFrameId) {
+          cancelAnimationFrame(visualizerFrameId);
+        }
+
+        isPlaying = false;
+        audioBtn.classList.remove('bg-steel/30', 'text-silver', 'animate-pulse');
+        audioBtn.innerHTML = '<i data-lucide="volume-x" class="h-4.5 w-4.5 text-mist"></i>';
+        lucide.createIcons();
+        clearVisualizer();
+      }
+
+      function drawVisualizer() {
+        if (!visualizerCanvas || !analyser) return;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function draw() {
+          if (!isPlaying) return;
+          visualizerFrameId = requestAnimationFrame(draw);
+          analyser.getByteFrequencyData(dataArray);
+
+          const width = visualizerCanvas.width;
+          const height = visualizerCanvas.height;
+          visualizerCtx.clearRect(0, 0, width, height);
+
+          visualizerCtx.lineWidth = 1.5;
+          visualizerCtx.strokeStyle = 'rgba(147, 167, 187, 0.6)';
+          visualizerCtx.beginPath();
+
+          const sliceWidth = width / bufferLength;
+          let x = 0;
+
+          for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 255.0;
+            const y = height / 2 + (v * height / 2) * (i % 2 === 0 ? 1 : -1) * 0.8;
+
+            if (i === 0) {
+              visualizerCtx.moveTo(x, y);
+            } else {
+              visualizerCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
+          }
+
+          visualizerCtx.lineTo(width, height / 2);
+          visualizerCtx.stroke();
+        }
+
+        draw();
+      }
+
+      function clearVisualizer() {
+        visualizerCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+        visualizerCtx.lineWidth = 1;
+        visualizerCtx.strokeStyle = 'rgba(77, 103, 134, 0.3)';
+        visualizerCtx.beginPath();
+        visualizerCtx.moveTo(0, visualizerCanvas.height / 2);
+        visualizerCtx.lineTo(visualizerCanvas.width, visualizerCanvas.height / 2);
+        visualizerCtx.stroke();
+      }
+
+      function handleGesture() {
+        if (!isPlaying) {
+          startAudioEngine();
+        }
+        window.removeEventListener('click', handleGesture);
+        window.removeEventListener('touchstart', handleGesture);
+      }
+
+      window.addEventListener('click', handleGesture);
+      window.addEventListener('touchstart', handleGesture);
+
+      audioBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent triggering the document gesture
+        if (isPlaying) {
+          stopAudioEngine();
+        } else {
+          startAudioEngine();
+        }
+      });
+
+      // Clear visualizer to static center line initially
+      clearVisualizer();
+
+
+      // --- ASTRONOMICAL COMPASS & GEOLOCATION ---
+      const ticksGroup = document.getElementById('ticks-group');
+      const needleGroup = document.getElementById('needle-group');
+      const bearingOutput = document.getElementById('bearing-output');
+      const dotNorth = document.getElementById('dot-north');
+      const dotParty = document.getElementById('dot-party');
+      const btnAlignNorth = document.getElementById('btn-align-north');
+      const btnLocateParty = document.getElementById('btn-locate-party');
+      const geoStatusBox = document.getElementById('geo-status');
+      const geoErrorBox = document.getElementById('geo-error');
+      const geoErrorText = document.getElementById('geo-error-text');
+      const geoSuccessBox = document.getElementById('geo-success');
+      const distanceValue = document.getElementById('distance-value');
+      const center18Text = document.getElementById('center-18');
+      const compassRingContainer = document.getElementById('compass-ring-container');
+
+      let currentMode = 'north'; // 'north' or 'party'
+      let currentBearing = null;
+      let compassTicksRotation = 0;
+
+      // Draw compass tick marks
+      function generateCompassTicks() {
+        let ticksHTML = '';
+        for (let deg = 0; deg < 360; deg += 10) {
+          const rad = (deg - 90) * Math.PI / 180;
+          const isMajor = deg % 30 === 0;
+          const rOuter = 102;
+          const rInner = isMajor ? 88 : 93;
+          const x1 = 120 + rOuter * Math.cos(rad);
+          const y1 = 120 + rOuter * Math.sin(rad);
+          const x2 = 120 + rInner * Math.cos(rad);
+          const y2 = 120 + rInner * Math.sin(rad);
+
+          ticksHTML += `
+            <line 
+              x1="${x1.toFixed(2)}" 
+              y1="${y1.toFixed(2)}" 
+              x2="${x2.toFixed(2)}" 
+              y2="${y2.toFixed(2)}" 
+              stroke="#4d6786" 
+              stroke-width="${isMajor ? 1.6 : 1}" 
+              opacity="${isMajor ? 0.8 : 0.4}"
+            />
+          `;
+        }
+        ticksGroup.innerHTML = ticksHTML;
+      }
+
+      generateCompassTicks();
+
+      // Continuous subtle ambient float for the compass
+      let floatAngle = 0;
+      function compassFloat() {
+        floatAngle += 0.02;
+        const floatY = Math.sin(floatAngle) * 5;
+        compassRingContainer.style.transform = `translateY(${floatY}px)`;
+        requestAnimationFrame(compassFloat);
+      }
+      compassFloat();
+
+      // Slow rotate the tick marks for subtle cosmic vibe
+      let slowSpinAngle = 0;
+      function slowSpin() {
+        slowSpinAngle += 0.05;
+        ticksGroup.style.transform = `rotate(${slowSpinAngle}deg)`;
+        requestAnimationFrame(slowSpin);
+      }
+      slowSpin();
+
+      // Haversine formula
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }
+
+      // Initial bearing calculation
+      function calculateBearing(lat1, lon1, lat2, lon2) {
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+        const y = Math.sin(Δλ) * Math.cos(φ2);
+        const x =
+          Math.cos(φ1) * Math.sin(φ2) -
+          Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+        const θ = Math.atan2(y, x);
+        return ((θ * 180) / Math.PI + 360) % 360;
+      }
+
+      // Action: Align North
+      btnAlignNorth.addEventListener('click', () => {
+        currentMode = 'north';
+        dotNorth.className = 'inline-block w-1.5 h-1.5 rounded-full bg-mist animate-pulse';
+        dotParty.className = 'inline-block w-1.5 h-1.5 rounded-full bg-steel/30';
+        
+        btnAlignNorth.className = 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-xs font-sans font-medium uppercase tracking-[1.5px] transition-all duration-300 bg-steel/30 text-silver border-steel/50';
+        btnLocateParty.className = 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-xs font-sans font-medium uppercase tracking-[1.5px] transition-all duration-300 bg-depth text-mist border-steel/10 hover:text-silver hover:bg-steel/15';
+
+        // Reset needle rotation to 0 (North)
+        needleGroup.style.transform = `rotate(0deg)`;
+        bearingOutput.textContent = 'N 0° 0\' 00" · Calibrado';
+        
+        // Hide stats
+        geoStatusBox.classList.add('hidden');
+        geoErrorBox.classList.add('hidden');
+        geoSuccessBox.classList.add('hidden');
+      });
+
+      // Action: Locate Party / Cómo llegar
+      btnLocateParty.addEventListener('click', () => {
+        // Toggle indicators
+        currentMode = 'party';
+        dotNorth.className = 'inline-block w-1.5 h-1.5 rounded-full bg-steel/30';
+        dotParty.className = 'inline-block w-1.5 h-1.5 rounded-full bg-white animate-pulse';
+
+        btnAlignNorth.className = 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-xs font-sans font-medium uppercase tracking-[1.5px] transition-all duration-300 bg-depth text-mist border-steel/10 hover:text-silver hover:bg-steel/15';
+        btnLocateParty.className = 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-xs font-sans font-medium uppercase tracking-[1.5px] transition-all duration-300 bg-white text-void border-white';
+
+        // Show status box
+        geoStatusBox.classList.remove('hidden');
+        geoErrorBox.classList.add('hidden');
+        geoSuccessBox.classList.add('hidden');
+
+        if (!navigator.geolocation) {
+          geoStatusBox.classList.add('hidden');
+          geoErrorText.textContent = 'Tu navegador no permite compartir tu ubicación.';
+          geoErrorBox.classList.remove('hidden');
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const uLat = pos.coords.latitude;
+            const uLng = pos.coords.longitude;
+
+            const dist = calculateDistance(uLat, uLng, VENUE_COORDS.lat, VENUE_COORDS.lng);
+            const bear = calculateBearing(uLat, uLng, VENUE_COORDS.lat, VENUE_COORDS.lng);
+
+            currentBearing = bear;
+
+            // Animate needle to bearing
+            needleGroup.style.transform = `rotate(${bear.toFixed(1)}deg)`;
+            bearingOutput.textContent = `RUMBO: ${bear.toFixed(1)}° NE`;
+
+            // Display distance metrics
+            distanceValue.textContent = `${dist.toFixed(1)} km`;
+            geoStatusBox.classList.add('hidden');
+            geoSuccessBox.classList.remove('hidden');
+          },
+          (err) => {
+            console.warn(err);
+            geoStatusBox.classList.add('hidden');
+            geoErrorText.textContent = 'No pudimos acceder a tu ubicación. Verifica los permisos de tu navegador.';
+            geoErrorBox.classList.remove('hidden');
+            
+            // Set needle to a pleasant default bearing anyway
+            needleGroup.style.transform = `rotate(45deg)`;
+            bearingOutput.textContent = `RUMBO: -- NE (Incierto)`;
+          },
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      });
+
+
+      // --- COUNTDOWN TIMER SYSTEM ---
+      const timerDays = document.getElementById('timer-days');
+      const timerHours = document.getElementById('timer-hours');
+      const timerMinutes = document.getElementById('timer-minutes');
+      const timerSeconds = document.getElementById('timer-seconds');
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const difference = TARGET_DATE - now;
+
+        if (difference <= 0) {
+          timerDays.textContent = '00';
+          timerHours.textContent = '00';
+          timerMinutes.textContent = '00';
+          timerSeconds.textContent = '00';
+          return;
+        }
+
+        const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const h = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((difference / (1000 * 60)) % 60);
+        const s = Math.floor((difference / 1000) % 60);
+
+        timerDays.textContent = String(d).padStart(2, '0');
+        timerHours.textContent = String(h).padStart(2, '0');
+        timerMinutes.textContent = String(m).padStart(2, '0');
+        timerSeconds.textContent = String(s).padStart(2, '0');
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+
+
+      // --- OBSERVER SCROLL ANIMATIONS (fade-in-sections) ---
+      const faders = document.querySelectorAll('.fade-in-section');
+      const appearOptions = {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
+      };
+
+      const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('visible');
+          appearOnScroll.unobserve(entry.target);
+        });
+      }, appearOptions);
+
+      faders.forEach(fader => {
+        appearOnScroll.observe(fader);
+      });
+    </script>
+  </body>
+</html>
